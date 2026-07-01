@@ -7,21 +7,30 @@ sdk: docker
 pinned: false
 ---
 
-# AI Summer Project Assignments - Manish Kajla
+# DocuMind Assignment 3 - FastAPI Backend Application
 
-This directory contains the completed assignments for the AI Summer Project.
+A modular, production-ready FastAPI application that implements standard text chunking, PDF/CSV parsing, Gemini LLM queries, and an automated AI-to-Manim video rendering pipeline.
 
 ---
 
-## Workspace Layout
+## 🚀 Live Deployment Links
+The backend is deployed and running live on Hugging Face Spaces. Below are the two different URLs:
+
+1. **Hugging Face Space Dashboard (For Submission)**:
+   👉 **[Hugging Face Space URL](https://huggingface.co/spaces/kajlamanish/documind_assignment_3_kajlamanish)**
+   *Use this link for project submissions. It hosts the build status, repository files, settings, and logs.*
+
+2. **Direct API Swagger Documentation (For Testing)**:
+   👉 **[Interactive API Documentation (Swagger Docs)](https://kajlamanish-documind-assignment-3-kajlamanish.hf.space/docs)**
+   *Use this link to run and test all the FastAPI endpoints (`/chunk`, `/pdf`, `/csv`, `/ask`, `/generate-code`, `/generate-video`) directly in your browser.*
+
+---
+
+## Folder Structure
 
 ```
-240622_ManishKajla/
-│
-├── Assignment_1.ipynb          # Python & NumPy Basics (Submitted & Untouched)
-├── Assignment_2.ipynb          # Retrieval-Augmented Generation (Submitted & Untouched)
-│
-├── main.py                     # FastAPI Entry point (App routes and input validations)
+documind/
+├── main.py                     # Entry point (App routes and input validations)
 ├── chunk.py                    # RecursiveCharacterTextSplitter chunking logic
 ├── pdf_utils.py                # PDF text and page extraction logic
 ├── csv_utils.py                # CSV to plain-text converter
@@ -29,26 +38,19 @@ This directory contains the completed assignments for the AI Summer Project.
 ├── manim_pipeline.py           # Self-healing Manim animation generator
 ├── requirements.txt            # Python dependencies
 ├── Dockerfile                  # Container instructions
-├── .env.example                # Environment template
-└── README.md                   # Project documentation
+├── README.md                   # Setup instructions
+├── uploads/                    # Scratch folder for uploaded files
+├── generated/                  # Destination directory for rendered .mp4 files
+└── temp/                       # Working directory for compiler scenes
 ```
 
 ---
 
-## 1. Notebooks (Assignment 1 & 2)
+## Installation & Local Setup
 
-* **Assignment_1.ipynb**: Contains implementations of standard Python data operations, random list statistics, NumPy array selections, and an OOP `Book` class.
-* **Assignment_2.ipynb**: Contains a complete local RAG search indexing and retrieval pipeline. Uses the `all-MiniLM-L6-v2` transformer model for local embeddings, persistent ChromaDB for storage, and a custom retrieval interface with mock LLM grounding, streaming outputs, and query logs.
-
----
-
-## 2. FastAPI Backend (Assignment 3)
-
-The backend exposes a highly robust REST API to chunk large texts, upload & parse files, perform LLM generation, and compile dynamic animations using the Manim pipeline.
-
-### Prerequisites (For Local Execution)
-To render Manim video animations on your local system, you must install the `ffmpeg` binary:
-* **macOS** (via Homebrew):
+### 1. Prerequisites
+To run the Manim video generator locally, you must install the `ffmpeg` system binary:
+* **macOS** (using Homebrew):
   ```bash
   brew install ffmpeg
   ```
@@ -56,60 +58,135 @@ To render Manim video animations on your local system, you must install the `ffm
   ```bash
   sudo apt-get update && sudo apt-get install -y ffmpeg
   ```
+* **Windows**: Download from [ffmpeg.org](https://ffmpeg.org/) and add it to your system PATH.
 
-### Local Setup
-1. Create and activate a virtual environment:
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   ```
-2. Install Python dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. Set your environment keys in a `.env` file:
-   ```env
-   GEMINI_API_KEY=your_gemini_api_key_here
-   ```
-4. Run the development server:
-   ```bash
-   uvicorn main:app --host 0.0.0.0 --port 8000 --reload
-   ```
-5. View API docs: Navigate to `http://localhost:8000/docs`.
+### 2. Configure Virtual Environment
+Set up a Python virtual environment and activate it:
+```bash
+python3 -m venv venv
+source venv/bin/activate  # On Windows: venv\Scripts\activate
+```
 
-### API Endpoints
+### 3. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
 
-* **GET /** Welcome greeting.
-* **POST /chunk?chunk_size=50&chunk_overlap=10**
-  Splits request body text into Recursive Character chunks. Validates size/overlap parameters.
-* **POST /pdf** (Multipart Form Upload)
-  Extracts text content and returns filename, page counts, and text representation.
-* **POST /csv** (Multipart Form Upload)
-  Converts tabular CSV rows into a plain-text grid format.
-* **POST /ask**
-  Submits questions to the Google Gemini model.
-* **POST /generate-code**
-  Requests Python code from a prompt and parses clean code out of Markdown fences.
-* **POST /generate-video**
-  Spawns the AI-to-Manim rendering pipeline. Uses Gemini to draft script scenes, compile them, self-heal upon syntax errors up to 3 retries, and returns the rendered `.mp4` video.
+### 4. Set Environment Variables
+Create a `.env` file in the root directory (based on `.env.example`):
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+### 5. Running the App Locally
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+```
+You can access the interactive Swagger documentation at `http://localhost:8000/docs`.
 
 ---
 
-## Deployment Instructions
+## API Endpoints
 
-### 1. Render Deployment
-1. Go to your [Render Dashboard](https://dashboard.render.com/) and create a **Web Service**.
+### 1. Welcome Greeting
+* **GET** `/`
+* **Response**:
+  ```json
+  {"message": "Welcome to DocuMind Assignment 3"}
+  ```
+
+### 2. Text Chunking
+* **POST** `/chunk?chunk_size=50&chunk_overlap=10`
+* **Payload**:
+  ```json
+  {"text": "Your large text to chunk goes here."}
+  ```
+* **Response**:
+  ```json
+  {
+    "chunks": ["Your large text to", "text to chunk goes here."],
+    "total_chunks": 2
+  }
+  ```
+
+### 3. PDF Upload
+* **POST** `/pdf` (Multipart form-data: upload a `.pdf` file)
+* **Response**:
+  ```json
+  {
+    "filename": "document.pdf",
+    "pages": 5,
+    "text": "Extracted text content from pages..."
+  }
+  ```
+
+### 4. CSV Upload
+* **POST** `/csv` (Multipart form-data: upload a `.csv` file)
+* **Response**:
+  ```json
+  {
+    "filename": "table.csv",
+    "text": "Plain text table grid representation of rows..."
+  }
+  ```
+
+### 5. Ask Gemini LLM
+* **POST** `/ask`
+* **Payload**:
+  ```json
+  {"query": "Explain quantum physics in one sentence."}
+  ```
+* **Response**:
+  ```json
+  {"response": "Quantum physics describes the behavior of matter and energy on microscopic scales..."}
+  ```
+
+### 6. Generate Python Code
+* **POST** `/generate-code`
+* **Payload**:
+  ```json
+  {"prompt": "Write a python function to check if a number is prime."}
+  ```
+* **Response**:
+  ```json
+  {
+    "code": "def is_prime(n):\n    if n <= 1:\n        return False\n..."
+  }
+  ```
+
+### 7. AI-to-Manim Rendering
+* **POST** `/generate-video`
+* **Payload**:
+  ```json
+  {"idea": "Draw a blue circle that expands and turns into a yellow square."}
+  ```
+* **Response**:
+  ```json
+  {
+    "status": "success",
+    "idea": "Draw a blue circle that expands and turns into a yellow square.",
+    "video_path": "generated/render_20260702_010000_ExpandCircle.mp4"
+  }
+  ```
+
+---
+
+## Deployment
+
+### Option 1: Render
+1. Create a Web Service on [Render](https://dashboard.render.com/).
 2. Connect your GitHub repository.
 3. Select **Docker** as the Environment.
 4. Under Environment variables, configure:
-   * `GEMINI_API_KEY`: `your_actual_api_key`
-5. Click deploy. Render will build the container using the provided `Dockerfile` and expose it.
+   * `GEMINI_API_KEY`: `your_actual_key`
+5. Click deploy. Render will build the container using the provided `Dockerfile` and expose port `7860`.
 
-### 2. Hugging Face Spaces Deployment
-1. Create a new Space at [huggingface.co/new-space](https://huggingface.co/new-space).
-2. Set Space SDK to **Docker**, and choose the **Blank** template.
-3. Commit this workspace folder (`240622_ManishKajla/`) along with your files.
-4. Add your API key in Space Settings under **Repository Secrets** as:
+### Option 2: Hugging Face Spaces
+1. Go to [Hugging Face Spaces](https://huggingface.co/new-space).
+2. Choose Space SDK: **Docker**.
+3. Select Docker Template: **Blank**.
+4. In your repository files, commit the `Dockerfile`, `requirements.txt`, and your application code.
+5. In Space Settings, add your API key in **Repository Secrets** as:
    * Name: `GEMINI_API_KEY`
-   * Value: `your_actual_api_key`
-5. Hugging Face will build the container and deploy the app at port `7860` automatically.
+   * Value: `your_actual_key`
+6. Hugging Face will build the Docker container and host the app at port `7860` automatically.

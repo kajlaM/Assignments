@@ -4,10 +4,16 @@ This repository contains the complete deliverables for Assignment 1, Assignment 
 
 ---
 
-## 🚀 Live Deployment (Assignment 3)
-The FastAPI backend service is deployed and running live on Hugging Face Spaces:
-👉 **[Hugging Face Space URL](https://huggingface.co/spaces/kajlamanish/documind_assignment_3_kajlamanish)**
-👉 **[Interactive API Documentation (Swagger Docs)](https://kajlamanish-documind-assignment-3-kajlamanish.hf.space/docs)**
+## 🚀 Live Deployment Links (Assignment 3)
+The FastAPI backend application is deployed and running live on Hugging Face Spaces. Below are the two different URLs:
+
+1. **Hugging Face Space Dashboard (For Submission)**:
+   👉 **[Hugging Face Space URL](https://huggingface.co/spaces/kajlamanish/documind_assignment_3_kajlamanish)**
+   *Use this link for project submissions. It hosts the build status, repository files, settings, and logs.*
+
+2. **Direct API Swagger Documentation (For Testing)**:
+   👉 **[Interactive API Documentation (Swagger Docs)](https://kajlamanish-documind-assignment-3-kajlamanish.hf.space/docs)**
+   *Use this link to run and test all the FastAPI endpoints (`/chunk`, `/pdf`, `/csv`, `/ask`, `/generate-code`, `/generate-video`) directly in your browser.*
 
 ---
 
